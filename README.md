@@ -7,7 +7,7 @@
 
 ⭐ **If you like this project, give it a star — it means a lot!** ⭐
 
-[🚀 Live Demo](#) · [🐞 Report Bug](#) · [💡 Request Feature](#)
+[🚀 Live Demo - https://novacredit-ai-1.onrender.com](#) · [🐞 Report Bug](#) · [💡 Request Feature](#)
 
 </div>
 
