@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard — NovaCredit AI{% endblock %}
+{% block content %}
+
+<div class="topbar">
+  <div>
+    <h1>🛡️ Admin Dashboard</h1>
+    <p>Portfolio-wide monitoring and recent activity.</p>
+  </div>
+</div>
+
+<div class="cards-grid">
+  <div class="glass metric-card"><div class="top-row"><div class="icon-badge purple">📁</div><span class="delta up">Live 🟢</span></div><div class="value">{{ stats.total }}</div><div class="label">Total Predictions</div></div>
+  <div class="glass metric-card"><div class="top-row"><div class="icon-badge pink">⚠️</div><span class="card-menu-dots">⋮</span></div><div class="value">{{ stats.high_risk }}</div><div class="label">High Risk Customers</div></div>
+  <div class="glass metric-card"><div class="top-row"><div class="icon-badge green">✅</div><span class="card-menu-dots">⋮</span></div><div class="value">{{ stats.low_risk }}</div><div class="label">Low Risk Customers</div></div>
+  <div class="glass metric-card"><div class="top-row"><div class="icon-badge cyan">💳</div><span class="card-menu-dots">⋮</span></div><div class="value">{{ stats.avg_credit_score }}</div><div class="label">Average Credit Score</div></div>
+  <div class="glass metric-card"><div class="top-row"><div class="icon-badge orange">🏦</div><span class="card-menu-dots">⋮</span></div><div class="value">₹{{ stats.avg_loan_amount }}</div><div class="label">Average Loan Amount</div></div>
+  <div class="glass metric-card"><div class="top-row"><div class="icon-badge blue">💰</div><span class="card-menu-dots">⋮</span></div><div class="value">₹{{ stats.avg_income }}</div><div class="label">Average Income</div></div>
+</div>
+
+<div class="charts-grid">
+  <div class="glass chart-card full">
+    <div class="chart-card-header"><h3>📈 Prediction Trend</h3><span class="card-menu-dots">⋮</span></div>
+    <canvas id="chartAdminTrend"></canvas>
+  </div>
+  <div class="glass chart-card">
+    <div class="chart-card-header"><h3>⚖️ Risk Split</h3><span class="card-menu-dots">⋮</span></div>
+    <div class="donut-layout">
+      <div class="legend-list" id="legendAdminRisk"></div>
+      <div class="donut-canvas-wrap">
+        <canvas id="chartAdminRisk"></canvas>
+        <div class="donut-center-text" id="centerAdminRisk"></div>
+      </div>
+    </div>
+  </div>
+  <div class="glass chart-card">
+    <div class="chart-card-header"><h3>📍 Top Cities</h3><span class="card-menu-dots">⋮</span></div>
+    <canvas id="chartAdminCity"></canvas>
+  </div>
+</div>
+
+<div class="glass table-card" style="margin-top:20px;">
+  <h3 style="margin-bottom:16px;">🕒 Recent Predictions</h3>
+  <table class="data-table">
+    <thead><tr><th>ID</th><th>📅 Date</th><th>👤 Customer</th><th>🚦 Prediction</th><th>📊 Probability</th></tr></thead>
+    <tbody>
+      {% for r in recent %}
+      <tr>
+        <td>#{{ r.id }}</td><td>{{ r.timestamp }}</td><td>{{ r.customer_name }}</td>
+        <td><span class="badge {{ 'high' if r.prediction == 'High Risk' else 'low' }}">{{ '⚠️' if r.prediction == 'High Risk' else '✅' }} {{ r.prediction }}</span></td>
+        <td>{{ r.prediction_probability }}%</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="5" style="text-align:center;padding:20px;color:var(--text-secondary);">No activity yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+const cd = {{ charts | tojson }};
+function tv(rows, l, v) { return { labels: rows.map(r => r[l]), values: rows.map(r => r[v]) }; }
+
+document.addEventListener("DOMContentLoaded", () => {
+  let d = tv(cd.monthly_trend, "month", "count");
+  crsChart("chartAdminTrend", "line", d.labels, [{ label: "Predictions", data: d.values }]);
+
+  d = tv(cd.prediction_distribution, "prediction", "count");
+  crsDonutWithLegend("chartAdminRisk", "legendAdminRisk", "centerAdminRisk", d.labels, d.values, ["#f87171", "#34d399"], "High Risk");
+
+  d = tv(cd.city_wise, "city", "count");
+  crsChart("chartAdminCity", "bar", d.labels, [{ label: "Loans", data: d.values, backgroundColor: "#8b5cf6" }], { indexAxis: "y" });
+});
+</script>
+{% endblock %}

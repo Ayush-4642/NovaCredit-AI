@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Home — NovaCredit AI{% endblock %}
+{% block content %}
+
+<section class="hero">
+  <span class="eyebrow">💠 NovaCredit AI — AI-Powered Banking Risk Intelligence</span>
+  <h1>Predict Loan Default Risk <span>Before It Happens</span> 💸</h1>
+  <p class="lead">
+    An intelligent banking risk analytics platform that scores every applicant in
+    real time 📊, stores full prediction history 🗂️, and surfaces the insights your
+    credit team needs to make faster, safer lending decisions 🏦.
+  </p>
+  <div class="hero-actions">
+    <a href="{{ url_for('predict.predict') }}" class="btn btn-primary">🎯 Start a Prediction</a>
+    <a href="{{ url_for('analytics.analytics') }}" class="btn btn-ghost">📈 View Analytics</a>
+  </div>
+</section>
+
+<div class="stats-row">
+  <div class="glass stat-card">
+    <div style="font-size:1.6rem;margin-bottom:6px;">📁</div>
+    <div class="value" data-counter="{{ stats.total }}">0</div>
+    <div class="label">Total Predictions</div>
+  </div>
+  <div class="glass stat-card">
+    <div style="font-size:1.6rem;margin-bottom:6px;">💳</div>
+    <div class="value" data-counter="{{ stats.avg_credit_score }}">0</div>
+    <div class="label">Avg. Credit Score</div>
+  </div>
+  <div class="glass stat-card">
+    <div style="font-size:1.6rem;margin-bottom:6px;">⚠️</div>
+    <div class="value" data-counter="{{ stats.default_rate }}">0</div>
+    <div class="label">High-Risk Rate (%)</div>
+  </div>
+  <div class="glass stat-card">
+    <div style="font-size:1.6rem;margin-bottom:6px;">🤖</div>
+    <div class="value" data-counter="64.5">0</div>
+    <div class="label">Model Accuracy (%)</div>
+  </div>
+</div>
+
+<section class="section">
+  <div class="section-header">
+    <h2>Everything you need for credit risk decisions</h2>
+    <p>A complete FinTech workflow — from data entry to explainable predictions</p>
+  </div>
+  <div class="features-grid">
+    <div class="glass feature-card">
+      <div class="icon-badge purple" style="margin-bottom:18px;">🎯</div>
+      <h3>Instant Risk Prediction</h3>
+      <p>A guided multi-step form feeds applicant data straight into a trained Random Forest classifier.</p>
+    </div>
+    <div class="glass feature-card">
+      <div class="icon-badge cyan" style="margin-bottom:18px;">📊</div>
+      <h3>Interactive Analytics</h3>
+      <p>Explore age, income 💰, credit score and loan distributions with animated Chart.js dashboards.</p>
+    </div>
+    <div class="glass feature-card">
+      <div class="icon-badge pink" style="margin-bottom:18px;">🗂️</div>
+      <h3>Full Prediction History</h3>
+      <p>Every prediction is stored automatically in SQLite — searchable, sortable, and exportable.</p>
+    </div>
+    <div class="glass feature-card">
+      <div class="icon-badge blue" style="margin-bottom:18px;">🧠</div>
+      <h3>Explainable Recommendations</h3>
+      <p>Each result comes with plain-language risk factors and actionable next steps.</p>
+    </div>
+    <div class="glass feature-card">
+      <div class="icon-badge orange" style="margin-bottom:18px;">📄</div>
+      <h3>Branded PDF Reports</h3>
+      <p>Download a polished, shareable PDF for every applicant assessment.</p>
+    </div>
+    <div class="glass feature-card">
+      <div class="icon-badge green" style="margin-bottom:18px;">🛡️</div>
+      <h3>Admin Control Center</h3>
+      <p>A dedicated dashboard tracks portfolio-wide risk trends 📈 and recent activity.</p>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

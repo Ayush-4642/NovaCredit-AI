@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% block title %}Analytics — NovaCredit AI{% endblock %}
+{% block content %}
+
+<div class="topbar">
+  <div>
+    <h1>📊 Portfolio Analytics</h1>
+    <p>Interactive visual breakdown of every prediction stored so far.</p>
+  </div>
+</div>
+
+<div class="cards-grid">
+  <div class="glass metric-card">
+    <div class="top-row"><div class="icon-badge purple">📁</div><span class="card-menu-dots">⋮</span></div>
+    <div class="value">{{ stats.total }}</div><div class="label">Total Predictions</div>
+  </div>
+  <div class="glass metric-card">
+    <div class="top-row"><div class="icon-badge cyan">💳</div><span class="card-menu-dots">⋮</span></div>
+    <div class="value">{{ stats.avg_credit_score }}</div><div class="label">Avg. Credit Score</div>
+  </div>
+  <div class="glass metric-card">
+    <div class="top-row"><div class="icon-badge pink">💰</div><span class="card-menu-dots">⋮</span></div>
+    <div class="value">₹{{ stats.avg_income }}</div><div class="label">Avg. Income</div>
+  </div>
+  <div class="glass metric-card">
+    <div class="top-row"><div class="icon-badge orange">🏦</div><span class="card-menu-dots">⋮</span></div>
+    <div class="value">₹{{ stats.avg_loan_amount }}</div><div class="label">Avg. Loan Amount</div>
+  </div>
+</div>
+
+<div class="charts-grid">
+  <div class="glass chart-card">
+    <div class="chart-card-header"><h3>🎂 Age Distribution</h3><span class="card-menu-dots">⋮</span></div>
+    <canvas id="chartAge"></canvas>
+  </div>
+  <div class="glass chart-card">
+    <div class="chart-card-header"><h3>💳 Credit Score Distribution</h3><span class="card-menu-dots">⋮</span></div>
+    <canvas id="chartCredit"></canvas>
+  </div>
+  <div class="glass chart-card">
+    <div class="chart-card-header"><h3>💰 Income Distribution</h3><span class="card-menu-dots">⋮</span></div>
+    <canvas id="chartIncome"></canvas>
+  </div>
+  <div class="glass chart-card">
+    <div class="chart-card-header"><h3>🏦 Loan Amount Distribution</h3><span class="card-menu-dots">⋮</span></div>
+    <canvas id="chartLoan"></canvas>
+  </div>
+
+  <div class="glass chart-card">
+    <div class="chart-card-header"><h3>🎯 Loan Purpose Breakdown</h3><span class="card-menu-dots">⋮</span></div>
+    <div class="donut-layout">
+      <div class="legend-list" id="legendPurpose"></div>
+      <div class="donut-canvas-wrap">
+        <canvas id="chartPurpose"></canvas>
+        <div class="donut-center-text" id="centerPurpose"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="glass chart-card">
+    <div class="chart-card-header"><h3>⚠️ High Risk vs ✅ Low Risk</h3><span class="card-menu-dots">⋮</span></div>
+    <div class="donut-layout">
+      <div class="legend-list" id="legendRisk"></div>
+      <div class="donut-canvas-wrap">
+        <canvas id="chartRisk"></canvas>
+        <div class="donut-center-text" id="centerRisk"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="glass chart-card">
+    <div class="chart-card-header"><h3>📍 City-wise Loan Count</h3><span class="card-menu-dots">⋮</span></div>
+    <canvas id="chartCity"></canvas>
+  </div>
+  <div class="glass chart-card">
+    <div class="chart-card-header"><h3>🧠 Feature Importance</h3><span class="card-menu-dots">⋮</span></div>
+    <canvas id="chartImportance"></canvas>
+  </div>
+
+  <div class="glass chart-card full">
+    <div class="chart-card-header"><h3>📈 Monthly Prediction Trend</h3><span class="card-menu-dots">⋮</span></div>
+    <canvas id="chartTrend"></canvas>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+const chartData = {{ charts | tojson }};
+
+function toLabelsValues(rows, labelKey, valueKey) {
+  return { labels: rows.map(r => r[labelKey]), values: rows.map(r => r[valueKey]) };
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  let d;
+
+  d = toLabelsValues(chartData.age_distribution, "bucket", "count");
+  crsChart("chartAge", "bar", d.labels, [{ label: "Applicants", data: d.values, backgroundColor: "#8b5cf6" }]);
+
+  d = toLabelsValues(chartData.credit_score_distribution, "bucket", "count");
+  crsChart("chartCredit", "doughnut", d.labels, [{ label: "Applicants", data: d.values }]);
+
+  d = toLabelsValues(chartData.income_distribution, "bucket", "count");
+  crsChart("chartIncome", "bar", d.labels, [{ label: "Applicants", data: d.values, backgroundColor: "#06b6d4" }]);
+
+  d = toLabelsValues(chartData.loan_distribution, "bucket", "count");
+  crsChart("chartLoan", "bar", d.labels, [{ label: "Applicants", data: d.values, backgroundColor: "#ec4899" }]);
+
+  d = toLabelsValues(chartData.loan_purpose_distribution, "loan_purpose", "count");
+  crsDonutWithLegend("chartPurpose", "legendPurpose", "centerPurpose", d.labels, d.values, null, "Top Purpose");
+
+  d = toLabelsValues(chartData.prediction_distribution, "prediction", "count");
+  crsDonutWithLegend("chartRisk", "legendRisk", "centerRisk", d.labels, d.values, ["#f87171", "#34d399"], "High Risk");
+
+  d = toLabelsValues(chartData.city_wise, "city", "count");
+  crsChart("chartCity", "bar", d.labels, [{ label: "Loans", data: d.values, backgroundColor: "#f97316" }], {
+    indexAxis: "y",
+  });
+
+  d = toLabelsValues(chartData.monthly_trend, "month", "count");
+  crsChart("chartTrend", "line", d.labels, [{ label: "Predictions", data: d.values }]);
+
+  fetch("{{ url_for('analytics.feature_importance') }}")
+    .then(r => r.json())
+    .then(fi => {
+      crsChart("chartImportance", "bar", fi.labels, [{ label: "Importance", data: fi.values, backgroundColor: "#3b82f6" }], {
+        indexAxis: "y",
+      });
+    });
+});
+</script>
+{% endblock %}

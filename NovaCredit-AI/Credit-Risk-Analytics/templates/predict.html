@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+{% block title %}Loan Prediction — AI Banking Credit Risk{% endblock %}
+{% block content %}
+
+<div class="topbar">
+  <div>
+    <h1>🎯 Loan Risk Prediction</h1>
+    <p>Fill in the applicant's details across three quick steps.</p>
+  </div>
+</div>
+
+<div class="glass form-card">
+  <div class="steps-track">
+    <div class="step-dot active" data-step="0">1</div>
+    <div class="step-line"></div>
+    <div class="step-dot" data-step="1">2</div>
+    <div class="step-line"></div>
+    <div class="step-dot" data-step="2">3</div>
+  </div>
+
+  <form id="predict-form" method="POST" action="{{ url_for('predict.predict') }}" novalidate>
+
+    <!-- STEP 1: Customer Information -->
+    <div class="form-step active">
+      <h2>👤 Customer Information</h2>
+      <div class="form-grid">
+        <div class="form-group full">
+          <label>Full Name</label>
+          <input type="text" name="customer_name" required value="{{ form_data.customer_name if form_data else '' }}">
+          <span class="error-msg">{{ errors.customer_name if errors }}</span>
+        </div>
+        <div class="form-group">
+          <label>Age</label>
+          <input type="number" name="age" min="18" max="100" required value="{{ form_data.age if form_data else '' }}">
+          <span class="error-msg">{{ errors.age if errors }}</span>
+        </div>
+        <div class="form-group">
+          <label>Gender</label>
+          <select name="gender" required>
+            <option value="">Select</option>
+            <option>Male</option><option>Female</option><option>Other</option>
+          </select>
+          <span class="error-msg">{{ errors.gender if errors }}</span>
+        </div>
+        <div class="form-group">
+          <label>Marital Status</label>
+          <select name="marital_status" required>
+            <option value="">Select</option>
+            <option>Single</option><option>Married</option><option>Divorced</option>
+          </select>
+          <span class="error-msg">{{ errors.marital_status if errors }}</span>
+        </div>
+        <div class="form-group">
+          <label>City</label>
+          <input type="text" name="city" required value="{{ form_data.city if form_data else '' }}">
+          <span class="error-msg">{{ errors.city if errors }}</span>
+        </div>
+        <div class="form-group">
+          <label>Education Level</label>
+          <select name="education_level" required>
+            <option value="">Select</option>
+            <option>High School</option><option>Bachelor</option><option>Master</option><option>PhD</option>
+          </select>
+          <span class="error-msg">{{ errors.education_level if errors }}</span>
+        </div>
+        <div class="form-group">
+          <label>Employment Status</label>
+          <select name="employment_status" required>
+            <option value="">Select</option>
+            <option>Salaried</option><option>Business</option><option>Self-Employed</option><option>Unemployed</option>
+          </select>
+          <span class="error-msg">{{ errors.employment_status if errors }}</span>
+        </div>
+      </div>
+      <div class="form-actions"><span></span><button type="button" class="btn btn-primary btn-next">Next →</button></div>
+    </div>
+
+    <!-- STEP 2: Financial Information -->
+    <div class="form-step">
+      <h2>💰 Financial Information</h2>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Annual Income (₹)</label>
+          <input type="number" name="income" min="0" required value="{{ form_data.income if form_data else '' }}">
+          <span class="error-msg">{{ errors.income if errors }}</span>
+        </div>
+        <div class="form-group">
+          <label>Credit Score</label>
+          <input type="number" name="credit_score" min="300" max="900" required value="{{ form_data.credit_score if form_data else '' }}">
+          <span class="error-msg">{{ errors.credit_score if errors }}</span>
+        </div>
+        <div class="form-group">
+          <label>Years Employed</label>
+          <input type="number" name="years_employed" min="0" max="60" required value="{{ form_data.years_employed if form_data else '' }}">
+          <span class="error-msg">{{ errors.years_employed if errors }}</span>
+        </div>
+        <div class="form-group">
+          <label>Existing Debt (₹)</label>
+          <input type="number" name="existing_debt" min="0" required value="{{ form_data.existing_debt if form_data else '' }}">
+          <span class="error-msg">{{ errors.existing_debt if errors }}</span>
+        </div>
+        <div class="form-group">
+          <label>Previous Loans</label>
+          <input type="number" name="previous_loans" min="0" max="50" required value="{{ form_data.previous_loans if form_data else '' }}">
+          <span class="error-msg">{{ errors.previous_loans if errors }}</span>
+        </div>
+        <div class="form-group">
+          <label>Late Payments</label>
+          <input type="number" name="late_payments" min="0" max="100" required value="{{ form_data.late_payments if form_data else '' }}">
+          <span class="error-msg">{{ errors.late_payments if errors }}</span>
+        </div>
+        <div class="form-group">
+          <label>Monthly Expenses (₹)</label>
+          <input type="number" name="monthly_expenses" min="0" required value="{{ form_data.monthly_expenses if form_data else '' }}">
+          <span class="error-msg">{{ errors.monthly_expenses if errors }}</span>
+        </div>
+        <div class="form-group">
+          <label>Savings Balance (₹)</label>
+          <input type="number" name="savings_balance" min="0" required value="{{ form_data.savings_balance if form_data else '' }}">
+          <span class="error-msg">{{ errors.savings_balance if errors }}</span>
+        </div>
+        <div class="form-group">
+          <label>Debt-to-Income Ratio</label>
+          <input type="number" step="0.01" name="debt_to_income_ratio" min="0" max="50" required value="{{ form_data.debt_to_income_ratio if form_data else '' }}">
+          <span class="error-msg">{{ errors.debt_to_income_ratio if errors }}</span>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-ghost btn-prev">← Back</button>
+        <button type="button" class="btn btn-primary btn-next">Next →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: Loan Information -->
+    <div class="form-step">
+      <h2>🏦 Loan Information</h2>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Loan Amount (₹)</label>
+          <input type="number" name="loan_amount" min="0" required value="{{ form_data.loan_amount if form_data else '' }}">
+          <span class="error-msg">{{ errors.loan_amount if errors }}</span>
+        </div>
+        <div class="form-group">
+          <label>Loan Term (months)</label>
+          <input type="number" name="loan_term" min="1" max="480" required value="{{ form_data.loan_term if form_data else '' }}">
+          <span class="error-msg">{{ errors.loan_term if errors }}</span>
+        </div>
+        <div class="form-group full">
+          <label>Loan Purpose</label>
+          <select name="loan_purpose" required>
+            <option value="">Select</option>
+            <option>Home</option><option>Car</option><option>Education</option>
+            <option>Business</option><option>Personal</option><option>Medical</option>
+          </select>
+          <span class="error-msg">{{ errors.loan_purpose if errors }}</span>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-ghost btn-prev">← Back</button>
+        <button type="submit" class="btn btn-primary">🎯 Predict Risk</button>
+      </div>
+    </div>
+
+  </form>
+</div>
+
+{% endblock %}

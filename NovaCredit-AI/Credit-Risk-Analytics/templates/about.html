@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}About — AI Banking Credit Risk{% endblock %}
+{% block content %}
+
+<div class="topbar">
+  <div>
+    <h1>ℹ️ About This Project</h1>
+    <p>NovaCredit AI — architecture &amp; workflow.</p>
+  </div>
+</div>
+
+<div class="glass" style="padding:30px;margin-bottom:24px;">
+  <h3 style="margin-bottom:10px;">📊 Dataset</h3>
+  <p style="color:var(--text-secondary);line-height:1.6;">
+    Trained on <strong>banking_risk_analytics_dataset.csv</strong> — 5,000 loan applicant
+    records spanning demographic, employment, and financial attributes, with a binary
+    <code>loan_default</code> target label.
+  </p>
+</div>
+
+<div class="glass" style="padding:30px;margin-bottom:24px;">
+  <h3 style="margin-bottom:10px;">🧠 Machine Learning Models</h3>
+  <p style="color:var(--text-secondary);line-height:1.6;">
+    Three classifiers were evaluated in <strong>Model_Training.ipynb</strong>: Logistic
+    Regression, Random Forest, and MLP/KNN variants. The production system serves
+    predictions using the trained <strong>Random Forest Classifier</strong>
+    (<code>random_forest_model.pkl</code>), selected for its strong balance of accuracy
+    and interpretability via feature importance.
+  </p>
+  <div class="tech-pills">
+    <span class="tech-pill">Logistic Regression</span>
+    <span class="tech-pill">Random Forest ✅ (production)</span>
+    <span class="tech-pill">K-Nearest Neighbors</span>
+    <span class="tech-pill">MLP Neural Network</span>
+  </div>
+</div>
+
+<div class="glass" style="padding:30px;margin-bottom:24px;">
+  <h3 style="margin-bottom:10px;">🛠️ Technologies Used</h3>
+  <div class="tech-pills">
+    <span class="tech-pill">Python Flask</span>
+    <span class="tech-pill">SQLite</span>
+    <span class="tech-pill">scikit-learn</span>
+    <span class="tech-pill">Chart.js</span>
+    <span class="tech-pill">HTML5 / CSS3 / JavaScript</span>
+    <span class="tech-pill">ReportLab (PDF)</span>
+  </div>
+</div>
+
+<div class="glass" style="padding:30px;">
+  <h3 style="margin-bottom:10px;">🔄 Project Workflow</h3>
+  <div class="timeline">
+    <div class="timeline-item"><div class="num">1</div><div><strong>Data Collection &amp; EDA</strong><p style="color:var(--text-secondary);">Exploratory analysis performed in EDA.ipynb.</p></div></div>
+    <div class="timeline-item"><div class="num">2</div><div><strong>Model Training</strong><p style="color:var(--text-secondary);">Random Forest trained and exported as random_forest_model.pkl in Model_Training.ipynb.</p></div></div>
+    <div class="timeline-item"><div class="num">3</div><div><strong>Web Application</strong><p style="color:var(--text-secondary);">Flask app wraps the model with a form, database, analytics, and PDF reporting.</p></div></div>
+    <div class="timeline-item"><div class="num">4</div><div><strong>Prediction &amp; Storage</strong><p style="color:var(--text-secondary);">Every submission is scored, explained, and stored in SQLite automatically.</p></div></div>
+  </div>
+</div>
+
+{% endblock %}

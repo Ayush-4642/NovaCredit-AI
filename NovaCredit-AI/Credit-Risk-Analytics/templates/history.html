@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Prediction History — AI Banking Credit Risk{% endblock %}
+{% block content %}
+
+<div class="topbar">
+  <div>
+    <h1>📜 Prediction History</h1>
+    <p>{{ total }} record(s) found</p>
+  </div>
+  <div style="display:flex;gap:10px;">
+    <a href="{{ url_for('history.export_csv') }}" class="btn btn-ghost btn-sm">⬇ Export CSV</a>
+    <a href="{{ url_for('history.export_pdf') }}" class="btn btn-ghost btn-sm">⬇ Export PDF</a>
+  </div>
+</div>
+
+<div class="glass table-card">
+  <form id="filter-form" method="GET" class="toolbar">
+    <input type="text" id="search-input" name="search" placeholder="🔍 Search name, city, purpose…" value="{{ search }}">
+    <select name="risk" data-auto-submit>
+      <option value="all" {{ 'selected' if risk_filter == 'all' }}>All Risk Levels</option>
+      <option value="High Risk" {{ 'selected' if risk_filter == 'High Risk' }}>High Risk</option>
+      <option value="Low Risk" {{ 'selected' if risk_filter == 'Low Risk' }}>Low Risk</option>
+    </select>
+    <select name="sort_by" data-auto-submit>
+      <option value="timestamp" {{ 'selected' if sort_by == 'timestamp' }}>Sort: Date</option>
+      <option value="customer_name" {{ 'selected' if sort_by == 'customer_name' }}>Sort: Name</option>
+      <option value="credit_score" {{ 'selected' if sort_by == 'credit_score' }}>Sort: Credit Score</option>
+      <option value="loan_amount" {{ 'selected' if sort_by == 'loan_amount' }}>Sort: Loan Amount</option>
+      <option value="prediction_probability" {{ 'selected' if sort_by == 'prediction_probability' }}>Sort: Probability</option>
+    </select>
+    <select name="sort_dir" data-auto-submit>
+      <option value="desc" {{ 'selected' if sort_dir == 'desc' }}>Descending</option>
+      <option value="asc" {{ 'selected' if sort_dir == 'asc' }}>Ascending</option>
+    </select>
+  </form>
+
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>ID</th><th>Date</th><th>Customer</th><th>City</th><th>Credit Score</th>
+        <th>Loan Amount</th><th>Purpose</th><th>Prediction</th><th>Probability</th><th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in records %}
+      <tr>
+        <td>#{{ r.id }}</td>
+        <td>{{ r.timestamp }}</td>
+        <td>{{ r.customer_name }}</td>
+        <td>{{ r.city }}</td>
+        <td>{{ r.credit_score }}</td>
+        <td>₹{{ r.loan_amount }}</td>
+        <td>{{ r.loan_purpose }}</td>
+        <td><span class="badge {{ 'high' if r.prediction == 'High Risk' else 'low' }}">{{ r.prediction }}</span></td>
+        <td>{{ r.prediction_probability }}%</td>
+        <td style="display:flex;gap:6px;">
+          <a href="{{ url_for('predict.result', record_id=r.id) }}" class="btn btn-ghost btn-sm">View</a>
+          <a href="{{ url_for('predict.download_report', record_id=r.id) }}" class="btn btn-ghost btn-sm">PDF</a>
+          <form id="del-{{ r.id }}" action="{{ url_for('history.delete', record_id=r.id) }}" method="POST" style="display:inline;"></form>
+          <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete('del-{{ r.id }}')">Delete</button>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="10" style="text-align:center;padding:30px;color:var(--text-secondary);">No records found.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div class="pagination">
+    {% for p in range(1, total_pages + 1) %}
+      <a href="{{ url_for('history.history', page=p, search=search, risk=risk_filter, sort_by=sort_by, sort_dir=sort_dir) }}"
+         class="{{ 'current' if p == page }}">{{ p }}</a>
+    {% endfor %}
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Customer Statistics — NovaCredit AI{% endblock %}
+{% block content %}
+
+<div class="topbar">
+  <div>
+    <h1>📈 Customer Statistics</h1>
+    <p>Aggregate profile of every applicant assessed by the system.</p>
+  </div>
+</div>
+
+<div class="cards-grid">
+  <div class="glass metric-card">
+    <div class="top-row"><div class="icon-badge purple">🎂</div><span class="card-menu-dots">⋮</span></div>
+    <div class="value">{{ stats.avg_age }}</div><div class="label">Average Age</div>
+  </div>
+  <div class="glass metric-card">
+    <div class="top-row"><div class="icon-badge cyan">💳</div><span class="card-menu-dots">⋮</span></div>
+    <div class="value">{{ stats.avg_credit_score }}</div><div class="label">Average Credit Score</div>
+  </div>
+  <div class="glass metric-card">
+    <div class="top-row"><div class="icon-badge orange">🏦</div><span class="card-menu-dots">⋮</span></div>
+    <div class="value">₹{{ stats.avg_loan_amount }}</div><div class="label">Average Loan Amount</div>
+  </div>
+  <div class="glass metric-card">
+    <div class="top-row"><div class="icon-badge pink">⚠️</div><span class="card-menu-dots">⋮</span></div>
+    <div class="value">{{ stats.default_rate }}%</div><div class="label">Default Rate</div>
+  </div>
+</div>
+
+<div class="charts-grid">
+  <div class="glass chart-card">
+    <div class="chart-card-header"><h3>🎂 Age Statistics</h3><span class="card-menu-dots">⋮</span></div>
+    <canvas id="chartAgeStat"></canvas>
+  </div>
+  <div class="glass chart-card">
+    <div class="chart-card-header"><h3>💰 Income Statistics</h3><span class="card-menu-dots">⋮</span></div>
+    <div class="donut-layout">
+      <div class="legend-list" id="legendIncomeStat"></div>
+      <div class="donut-canvas-wrap">
+        <canvas id="chartIncomeStat"></canvas>
+        <div class="donut-center-text" id="centerIncomeStat"></div>
+      </div>
+    </div>
+  </div>
+  <div class="glass chart-card">
+    <div class="chart-card-header"><h3>🏦 Loan Statistics</h3><span class="card-menu-dots">⋮</span></div>
+    <canvas id="chartLoanStat"></canvas>
+  </div>
+  <div class="glass chart-card">
+    <div class="chart-card-header"><h3>💳 Credit Score Statistics</h3><span class="card-menu-dots">⋮</span></div>
+    <div class="donut-layout">
+      <div class="legend-list" id="legendCreditStat"></div>
+      <div class="donut-canvas-wrap">
+        <canvas id="chartCreditStat"></canvas>
+        <div class="donut-center-text" id="centerCreditStat"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+const cd = {{ charts | tojson }};
+function tv(rows, l, v) { return { labels: rows.map(r => r[l]), values: rows.map(r => r[v]) }; }
+
+document.addEventListener("DOMContentLoaded", () => {
+  let d = tv(cd.age_distribution, "bucket", "count");
+  crsChart("chartAgeStat", "bar", d.labels, [{ label: "Customers", data: d.values, backgroundColor: "#8b5cf6" }]);
+
+  d = tv(cd.income_distribution, "bucket", "count");
+  crsDonutWithLegend("chartIncomeStat", "legendIncomeStat", "centerIncomeStat", d.labels, d.values, null, "Top Bracket");
+
+  d = tv(cd.loan_distribution, "bucket", "count");
+  crsChart("chartLoanStat", "bar", d.labels, [{ label: "Customers", data: d.values, backgroundColor: "#f97316" }]);
+
+  d = tv(cd.credit_score_distribution, "bucket", "count");
+  crsDonutWithLegend("chartCreditStat", "legendCreditStat", "centerCreditStat", d.labels, d.values, null, "Top Tier");
+});
+</script>
+{% endblock %}

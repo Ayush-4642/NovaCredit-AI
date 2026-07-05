@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}NovaCredit AI{% endblock %}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+{% block extra_head %}{% endblock %}
+</head>
+<body>
+<div class="bg-orbs"><div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div></div>
+
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><div class="logo-dot">💠</div><div><div class="brand-name">NovaCredit <span>AI</span></div><div class="brand-tag">AI-Powered Banking Risk Intelligence</div></div></div>
+
+    <div class="nav-group-label">General</div>
+    <a href="{{ url_for('home.home') }}" class="{{ 'active' if request.endpoint == 'home.home' }}">🏠 <span>Home</span></a>
+    <a href="{{ url_for('predict.predict') }}" class="{{ 'active' if request.endpoint and request.endpoint.startswith('predict.') }}">🎯 <span>Loan Prediction</span></a>
+    <a href="{{ url_for('history.history') }}" class="{{ 'active' if request.endpoint == 'history.history' }}">📜 <span>History</span></a>
+
+    <div class="nav-group-label">Reports</div>
+    <a href="{{ url_for('analytics.analytics') }}" class="{{ 'active' if request.endpoint == 'analytics.analytics' }}">📊 <span>Analytics</span></a>
+    <a href="{{ url_for('dashboard.dashboard') }}" class="{{ 'active' if request.endpoint == 'dashboard.dashboard' }}">📈 <span>Customer Stats</span></a>
+    <a href="{{ url_for('admin.admin') }}" class="{{ 'active' if request.endpoint == 'admin.admin' }}">🛡️ <span>Admin</span></a>
+
+    <div class="nav-group-label">Settings</div>
+    <a href="{{ url_for('home.about') }}" class="{{ 'active' if request.endpoint == 'home.about' }}">ℹ️ <span>About</span></a>
+
+    <div class="sidebar-footer">
+      <div class="glass upsell-card">
+        <div style="font-size:1.6rem;">🚀</div>
+        <p>Unlock deeper risk insights with NovaCredit AI Pro.</p>
+        <a href="{{ url_for('analytics.analytics') }}" class="btn btn-primary btn-sm btn-block">✨ Explore Analytics</a>
+      </div>
+      <button class="theme-toggle" onclick="toggleTheme()"><span id="theme-icon">🌙</span></button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="welcome-bar glass">
+      <div class="welcome-user">
+        <div class="avatar-emoji">🧑‍💼</div>
+        <div>
+          <div class="welcome-title">Welcome! <strong>Risk Analyst</strong></div>
+          <div class="welcome-sub">Smarter lending starts with 💡 better data.</div>
+        </div>
+      </div>
+      <div class="welcome-search">
+        <span>🔍</span>
+        <input type="text" placeholder="Search predictions, customers, cities…" onkeydown="if(event.key==='Enter'){window.location='{{ url_for('history.history') }}?search='+encodeURIComponent(this.value)}">
+      </div>
+      <div class="welcome-actions">
+        <button class="icon-btn">💬</button>
+        <button class="icon-btn">🔔</button>
+        <button class="hamburger" id="hamburger-btn">☰</button>
+      </div>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+
+    <div class="footer">© {{ current_year }} NovaCredit AI 💠 — AI-Powered Banking Risk Intelligence — Built with Flask, SQLite &amp; Random Forest ML</div>
+  </main>
+</div>
+
+<div class="loading-overlay" id="loading-overlay">
+  <div class="spinner"></div>
+  <p>🤖 Analyzing risk profile with Random Forest model…</p>
+</div>
+
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>

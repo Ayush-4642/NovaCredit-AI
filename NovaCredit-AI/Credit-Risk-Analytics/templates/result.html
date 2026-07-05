@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Prediction Result — AI Banking Credit Risk{% endblock %}
+{% block content %}
+
+<div class="topbar">
+  <div>
+    <h1>Prediction Result</h1>
+    <p>Assessment for {{ record.customer_name }} — generated {{ record.timestamp }}</p>
+  </div>
+</div>
+
+<div class="result-wrap">
+  <div class="glass gauge-card">
+    <h3 style="margin-bottom:16px;">🎯 Risk Gauge</h3>
+    <div class="gauge-wrap">
+      <canvas id="riskGauge" width="220" height="130"></canvas>
+    </div>
+    <div class="gauge-scale"><span>0%</span><span>100%</span></div>
+    <div style="font-size:2rem;font-weight:800;">{{ record.prediction_probability }}%</div>
+    <p style="color:var(--text-secondary);font-size:0.85rem;">Probability of Default</p>
+    <span class="risk-badge {{ 'high' if record.prediction == 'High Risk' else 'low' }}">
+      {{ '⚠️' if record.prediction == 'High Risk' else '✅' }} {{ record.prediction }}
+    </span>
+  </div>
+
+  <div class="glass summary-card">
+    <h3 style="margin-bottom:10px;">📋 Feature Summary</h3>
+    <div class="row"><span>💳 Credit Score</span><span>{{ record.credit_score }}</span></div>
+    <div class="row"><span>💰 Annual Income</span><span>₹{{ record.income }}</span></div>
+    <div class="row"><span>🏦 Loan Amount</span><span>₹{{ record.loan_amount }}</span></div>
+    <div class="row"><span>📉 Existing Debt</span><span>₹{{ record.existing_debt }}</span></div>
+    <div class="row"><span>⏱️ Late Payments</span><span>{{ record.late_payments }}</span></div>
+    <div class="row"><span>🏛️ Savings Balance</span><span>₹{{ record.savings_balance }}</span></div>
+    <div class="row"><span>⚖️ Debt-to-Income Ratio</span><span>{{ record.debt_to_income_ratio }}</span></div>
+  </div>
+
+  <div class="glass summary-card">
+    <h3 style="margin-bottom:6px;">⚠️ Risk Factors</h3>
+    <ul class="reco-list">
+      {% for reason in reasons %}<li>• {{ reason }}</li>{% endfor %}
+    </ul>
+  </div>
+
+  <div class="glass summary-card">
+    <h3 style="margin-bottom:6px;">💡 Recommendations</h3>
+    <ul class="reco-list">
+      {% for tip in tips %}<li>✓ {{ tip }}</li>{% endfor %}
+    </ul>
+  </div>
+</div>
+
+<div style="display:flex;gap:14px;justify-content:center;margin-top:30px;flex-wrap:wrap;">
+  <a href="{{ url_for('predict.download_report', record_id=record.id) }}" class="btn btn-primary">📄 Download PDF Report</a>
+  <a href="{{ url_for('predict.view_report', record_id=record.id) }}" class="btn btn-ghost" target="_blank">🧾 View Printable Report</a>
+
+  <a href="{{ url_for('predict.predict') }}" class="btn btn-ghost">🔄 New Prediction</a>
+  <a href="{{ url_for('history.history') }}" class="btn btn-ghost">📜 View History</a>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  drawRiskGauge('riskGauge', {{ record.prediction_probability }}, {{ 'true' if record.prediction == 'High Risk' else 'false' }});
+</script>
+{% endblock %}
